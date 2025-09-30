@@ -62,6 +62,7 @@
 		"psalm": "psalm --no-cache --threads=$(nproc)",
 		"psalm:ocp": "psalm --no-cache --threads=$(nproc) -c psalm-ocp.xml",
 		"psalm:ncu": "psalm --no-cache --threads=$(nproc) -c psalm-ncu.xml",
+		"psalm:sharing": "psalm --no-cache --threads=$(nproc) -c apps/sharing/psalm.xml",
 		"psalm:security": "psalm --no-cache --threads=$(nproc) --taint-analysis --use-baseline=build/psalm-baseline-security.xml",
 		"psalm:update-baseline": "psalm --no-cache --threads=$(nproc) --update-baseline",
 		"serve": [
