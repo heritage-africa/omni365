@@ -2161,11 +2161,7 @@ class ShareAPIController extends OCSController {
 				// 1. If parent hides download, child must hide download
 				// 2. If parent allows download, child can choose to hide or allow
 				// 3. If parent forbids download, child cannot allow download
-				if ($parentHidesDownload) {
-					$hideDownload = true; // Parent forces hide, child cannot override
-				} else {
-					$hideDownload = $userExplicitlySetHideDownload; // Respect user's choice when parent allows
-				}
+				$hideDownload = $parentHidesDownload ||  $userExplicitlySetHideDownload
 				
 				$canDownload = $canDownload || $parentAllowsDownload;
 				
