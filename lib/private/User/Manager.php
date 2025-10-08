@@ -10,6 +10,7 @@ namespace OC\User;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use OC\Hooks\PublicEmitter;
 use OC\Memcache\WithLocalCache;
+use OCP\Config\IUserConfig;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\HintException;
@@ -69,6 +70,7 @@ class Manager extends PublicEmitter implements IUserManager {
 
 	public function __construct(
 		private IConfig $config,
+		private IUserConfig $userConfig,
 		ICacheFactory $cacheFactory,
 		private IEventDispatcher $eventDispatcher,
 		private LoggerInterface $logger,
@@ -661,17 +663,17 @@ class Manager extends PublicEmitter implements IUserManager {
 	 * @return IUser[]
 	 * @since 9.1.0
 	 */
-	public function getByEmail($email) {
+	public function getByEmail($email): array {
+		$users = [];
 		// looking for 'email' only (and not primary_mail) is intentional
-		$userIds = $this->config->getUsersForUserValueCaseInsensitive('settings', 'email', $email);
-
-		$users = array_map(function ($uid) {
-			return $this->get($uid);
-		}, $userIds);
-
-		return array_values(array_filter($users, function ($u) {
-			return ($u instanceof IUser);
-		}));
+		$userIds = $this->userConfig->searchUsersByValueString('settings', 'email', $email, caseInsensitive: true);
+		foreach ($userIds as $userId) {
+			$user = $this->get($userId);
+			if ($user !== null) {
+				$users[] = $user;
+			}
+		}
+		return $users;
 	}
 
 	/**
