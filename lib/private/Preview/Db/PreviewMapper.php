@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OC\Preview\Db;
 
+use DateInterval;
+use DateTimeImmutable;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -193,5 +195,13 @@ class PreviewMapper extends QBMapper {
 				}, $mimeTypes)
 			));
 		return $this->yieldEntities($qb);
+	}
+
+	public function deleteExpiredPreviews(int $maxDays): void {
+		$delete = $this->db->getQueryBuilder();
+		$delete
+			->delete($this->getTableName())
+			->where($delete->expr()->lt('mtime', $delete->createNamedParameter((new DateTimeImmutable())->sub(new DateInterval('P' . $maxDays . 'D'))->getTimestamp(), IQueryBuilder::PARAM_INT)))
+			->executeStatement();
 	}
 }

@@ -106,4 +106,8 @@ class PreviewService {
 	public function getAvailablePreviews(array $fileIds): array {
 		return $this->previewMapper->getAvailablePreviews($fileIds);
 	}
+
+	public function deleteExpiredPreviews(int $maxDays): void {
+		$this->previewMapper->deleteExpiredPreviews($maxDays);
+	}
 }
