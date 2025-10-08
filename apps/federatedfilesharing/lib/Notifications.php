@@ -359,6 +359,10 @@ class Notifications {
 	 * @return array|false
 	 */
 	protected function tryOCMEndPoint($remoteDomain, $fields, $action) {
+		if (str_starts_with($remoteDomain, 'https://')) {
+			$remoteDomain = substr($remoteDomain, 8);
+		}
+
 		switch ($action) {
 			case 'share':
 				$share = $this->cloudFederationFactory->getCloudFederationShare(
