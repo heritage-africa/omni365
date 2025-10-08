@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunknextcloud_mail=self.webpackChunknextcloud_mail||[]).push([[798],{56798:(e,l,u)=>{u.r(l),u.d(l,{default:()=>a.N});var a=u(59053)}}]);
