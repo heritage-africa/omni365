@@ -20,6 +20,7 @@ class AppDiscoverFetcherTest extends FetcherBase {
 		parent::setUp();
 		$this->fileName = 'discover.json';
 		$this->endpoint = 'https://apps.nextcloud.com/api/v1/discover.json';
+		#$this->endpoint = 'https://raw.githubusercontent.com/heritage-africa/omni365-hub/main/discover.json';
 
 		$this->compareVersion = $this->createMock(CompareVersion::class);
 
