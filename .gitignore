@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2016-2024 Nextcloud GmbH and Nextcloud contributors
+#1 SPDX-FileCopyrightText: 2016-2024 Nextcloud GmbH and Nextcloud contributors
 # SPDX-FileCopyrightText: 2011-2016 ownCloud contributors
 # SPDX-FileCopyrightText: 2010 ownCloud contributors
 # SPDX-License-Identifier: AGPL-3.0-only
@@ -71,7 +71,7 @@
 
 
 # ignore themes except the example and the README
-/themes/*
+#/themes/*
 !/themes/example
 !/themes/README
 

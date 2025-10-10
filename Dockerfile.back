@@ -12,10 +12,9 @@ LABEL name="Omni365" \
 
 # Variables d'environnement
 ENV NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION} \
-    PHP_MEMORY_LIMIT=20480M \
-    PHP_MAX_EXECUTION_TIME=1200 \
-    PHP_UPLOAD_LIMIT=20480M \
-    OPCACHE_MEMORY_CONSUMPTION=512 \
+    PHP_MEMORY_LIMIT=512M \
+    PHP_UPLOAD_LIMIT=512M \
+    OPCACHE_MEMORY_CONSUMPTION=128 \
     APACHE_RUN_USER=www-data \
     APACHE_RUN_GROUP=www-data \
     HOME=/var/www/html \
@@ -84,8 +83,8 @@ RUN phpenmod apcu redis
 RUN echo "memory_limit = ${PHP_MEMORY_LIMIT}" > /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "upload_max_filesize = ${PHP_UPLOAD_LIMIT}" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "post_max_size = ${PHP_UPLOAD_LIMIT}" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
-    echo "max_execution_time = 1200" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
-    echo "max_input_time = 1200" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
+    echo "max_execution_time = 360" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
+    echo "max_input_time = 360" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "date.timezone = UTC" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "opcache.enable = 1" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "opcache.interned_strings_buffer = 16" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
@@ -122,18 +121,6 @@ RUN echo "📥 Clonage du repository Omni365..." && \
 # Installation des dépendances Composer
 RUN cd ${HOME} && \
     composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-
-# Installation de l'application Activity avec la bonne branche
-RUN echo "📱 Installation de l'application Activity..." && \
-    cd ${HOME}/apps && \
-    # Cloner avec la branche spécifique v31.0.7
-    git clone --branch v31.0.7 --depth 1 https://github.com/nextcloud/activity.git && \
-    cd activity && \
-    # Installation des dépendances de l'app activity
-    if [ -f "composer.json" ]; then \
-        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist; \
-    fi && \
-    echo "✅ Activity v31.0.7 installée avec succès"
 
 # Installation de l'application Notifications avec la bonne branche
 RUN echo "📱 Installation de l'application Notifications..." && \
@@ -204,6 +191,5 @@ VOLUME ["/var/www/html/data", "/var/www/html/config", "/var/www/html/apps2"]
 
 WORKDIR ${HOME}
 
-
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2ctl", "-D", "FOREGROUND"] 
+CMD ["apache2ctl", "-D", "FOREGROUND"]
