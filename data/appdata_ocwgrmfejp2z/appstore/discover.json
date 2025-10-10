@@ -1,0 +1,137 @@
+{
+    "data": [
+      
+        {
+            "type": "carousel",
+            "id": "1d41a08e-4aa6-49b3-ad1b-ff2e83beee6",
+            "headline": {
+                "en": "Do you already know this app?",
+                "de": "Kennst du bereits diese App?",
+                "fr": "Connaissez-vous d\u00e9j\u00e0 cette application?"
+            },
+            "content": [
+                {
+                    "type": "post",
+                    "id": "app-analytics",
+                    "headline": {
+                        "en": "Unlock the power of data with Analytics"
+                    },
+                    "text": {
+                        "en": "Seamlessly connect data from multiple sources\u2014external platforms, Tables, or Forms\u2014into one unified hub. Create flexible reports and build meaningful dashboards, all integrated with the powerful Omni365 AI for smarter insights and decisions."
+                    },
+                    "link": "app:\/\/analytics"
+                },
+                {
+                    "type": "post",
+                    "id": "app-tasks",
+                    "headline": {
+                        "en": "Tasks"
+                    },
+                    "text": {
+                        "en": "A tasks app for Omni365. Easily sync tasks from various devices with your Omni365 and edit them online. \u2728 This is the first app migrated to Vue 3 for Omni365 \u2728"
+                    },
+                    "link": "app:\/\/tasks"
+                },
+                {
+                    "type": "post",
+                    "id": "app-forms",
+                    "headline": {
+                        "en": "Forms"
+                    },
+                    "text": {
+                        "en": "\ud83d\udcdd Simple surveys and questionnaires, self-hosted! With Omni365  you can now also archive old forms to cleanup your workspace \ud83e\uddf9"
+                    },
+                    "link": "app:\/\/forms"
+                },
+                {
+                    "type": "post",
+                    "id": "app-cookbook",
+                    "headline": {
+                        "en": "Cookbook \ud83d\udc68\u200d\ud83c\udf73"
+                    },
+                    "text": {
+                        "en": "A library for all your recipes. To add a recipe to the collection, you can paste in the URL of the recipe, and the provided web page will be parsed and downloaded to whichever folder you specify in the app settings. "
+                    },
+                    "link": "app:\/\/cookbook"
+                }
+            ]
+        },
+        {
+            "type": "showcase",
+            "id": "1d41a08e-4fdsfs6-49b3-ad1b-ff2e83bcdf96",
+            "headline": {
+                "en": "Best rated apps",
+                "de": "Am besten bewertete Apps",
+                "fr": "Applications les mieux not\u00e9es"
+            },
+            "content": [
+                {
+                    "type": "app",
+                    "appId": "richdocuments"
+                },
+                {
+                    "type": "app",
+                    "appId": "whiteboard"
+                },
+                {
+                    "type": "app",
+                    "appId": "cospend"
+                },
+                {
+                    "type": "app",
+                    "appId": "cookbook"
+                },
+                {
+                    "type": "app",
+                    "appId": "gpxpod"
+                },
+                {
+                    "type": "app",
+                    "appId": "memories"
+                },
+                {
+                    "type": "app",
+                    "appId": "drawio"
+                }
+            ]
+        },
+        {
+            "type": "carousel",
+            "id": "1d41a08e-4aa6-49b3-ad1b-ff2eeebcdf96",
+            "headline": {
+                "en": "News from Omni365",
+                "de": "Neuigkeiten \u00fcber Omni365",
+                "fr": "Actualit\u00e9s de Omni365"
+            },
+            "content": [
+              
+                {
+                    "type": "post",
+                    "id": "1d41a08e-4aa6-49b4-bb1b-fddddbcdc96",
+                    "headline": {
+                        "en": "Digital Sovereignty Index: How countries compare in digital independence"
+                    },
+                    "text": {
+                        "en": "The debate around digital sovereignty has gained momentum. We show how countries compare in digital independence."
+                    },
+                    "media": {
+                        "alignment": "start",
+                        "content": {
+                            "en": {
+                                "src": {
+                                    "src": "https:\/\/nextcloud.com\/c\/uploads\/2025\/08\/Nextcloud-Digital-Sovereignty-Index.png",
+                                    "mime": "image\/png"
+                                },
+                                "alt": "Digital Sovereignty Index: How countries compare in digital independence"
+                            }
+                        }
+                    },
+                    "link": "https:\/\/docs.heritage.africa"
+                }
+                         ]
+        }
+    ],
+    "timestamp": 1760011288,
+    "ncversion": "31.0.7.1",
+    "ETag": "\"68e7a3c1-73e\""
+}
