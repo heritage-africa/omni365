@@ -1,0 +1,132 @@
+#!/bin/bash
+set -e
+
+echo "🚀 Démarrage de Omni365..."
+
+# Attendre que PostgreSQL soit disponible (si les variables d'environnement sont définies)
+if [ -n "$POSTGRES_HOST" ] && [ -n "$POSTGRES_USER" ]; then
+    echo "⏳ Vérification de la connexion PostgreSQL..."
+    
+    # Vérifier si nous avons postgresql-client installé
+    if command -v pg_isready >/dev/null 2>&1; then
+        until pg_isready -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -t 30; do
+            echo "⏱️  En attente de PostgreSQL sur $POSTGRES_HOST..."
+            sleep 5
+        done
+        echo "✅ PostgreSQL est accessible"
+    else
+        echo "⚠️  pg_isready non disponible, test avec PHP..."
+        php /usr/local/bin/test-postgresql.php
+    fi
+fi
+
+# Configuration des permissions au démarrage
+mkdir -p /var/www/html/data /var/www/html/config /var/www/html/apps2
+mkdir -p /var/log/apache2 /var/run/apache2 /var/www/sessions /var/lock/apache2
+
+# Configuration des permissions
+chown -R www-data:www-data /var/www/html /var/log/apache2 /var/www/sessions /var/run/apache2 /var/lock/apache2
+chmod -R 750 /var/www/html/data /var/www/html/config
+chmod -R 755 /var/www/html/apps2 /var/www/html/apps
+chmod -R 755 /var/log/apache2
+chmod -R 770 /var/www/sessions
+chmod -R 755 /var/run/apache2 /var/lock/apache2
+
+# Configuration de PHP pour utiliser notre dossier sessions personnalisé
+if [ -f "/etc/php/8.3/cli/php.ini" ]; then
+    sed -i 's|^;session.save_path = "/tmp"|session.save_path = "/var/www/sessions"|' /etc/php/8.3/cli/php.ini
+fi
+
+if [ -f "/etc/php/8.3/apache2/php.ini" ]; then
+    sed -i 's|^;session.save_path = "/tmp"|session.save_path = "/var/www/sessions"|' /etc/php/8.3/apache2/php.ini
+fi
+
+# Test de connexion PostgreSQL avec PHP
+echo "🔧 Test de connexion à la base de données..."
+php /usr/local/bin/test-postgresql.php
+
+# Vérification de l'installation Nextcloud/Omni365
+if [ -f "/var/www/html/occ" ]; then
+    echo "🔧 Vérification de l'installation Omni365..."
+    
+    # Vérifier si Nextcloud est déjà installé
+    if [ ! -f "/var/www/html/config/config.php" ]; then
+        echo "⚠️  Omni365 n'est pas configuré. Installation nécessaire."
+        
+        # Si les variables PostgreSQL sont définies, configurer automatiquement
+        if [ -n "$POSTGRES_HOST" ] && [ -n "$POSTGRES_USER" ] && [ -n "$POSTGRES_PASSWORD" ] && [ -n "$POSTGRES_DB" ]; then
+            echo "🔧 Configuration automatique avec PostgreSQL..."
+            sudo -u www-data php /var/www/html/occ maintenance:install \
+                --database="pgsql" \
+                --database-host="$POSTGRES_HOST" \
+                --database-name="$POSTGRES_DB" \
+                --database-user="$POSTGRES_USER" \
+                --database-pass="$POSTGRES_PASSWORD" \
+                --admin-user="${ADMIN_USER:-admin}" \
+                --admin-pass="${ADMIN_PASS:-admin}" \
+                --data-dir="/var/www/html/data"
+                
+            if [ $? -eq 0 ]; then
+                echo "✅ Installation Omni365 réussie avec PostgreSQL"
+            else
+                echo "❌ Échec de l'installation automatique"
+            fi
+        else
+            echo "ℹ️  Variables PostgreSQL manquantes, installation manuelle requise"
+        fi
+    else
+        echo "✅ Omni365 est déjà configuré"
+        
+        # Mise à jour si nécessaire
+        sudo -u www-data php /var/www/html/occ upgrade --no-interaction || true
+    fi
+
+    # Activation des applications
+    echo "🔧 Activation des applications..."
+    APPS="activity notifications"
+
+    for app in $APPS; do
+        if [ -d "/var/www/html/apps/$app" ]; then
+            echo "✅ Application $app installée - activation..."
+            sudo -u www-data php /var/www/html/occ app:enable $app --no-interaction || echo "⚠️  Impossible d'activer $app (peut-être déjà activé)"
+        else
+            echo "⚠️  Application $app non trouvée dans /var/www/html/apps/"
+        fi
+    done
+
+    # Configuration supplémentaire si nécessaire
+    if [ -f "/var/www/html/config/config.php" ]; then
+        echo "🔧 Configuration des paramètres Omni365..."
+        
+        # Désactiver la vérification de l'adresse IP si derrière un proxy (typique dans OpenShift)
+        sudo -u www-data php /var/www/html/occ config:system:set trusted_proxies 0 --value="10.0.0.0/8" 2>/dev/null || true
+        sudo -u www-data php /var/www/html/occ config:system:set overwritehost --value="${OVERWRITE_HOST:-}" 2>/dev/null || true
+        sudo -u www-data php /var/www/html/occ config:system:set overwriteprotocol --value="${OVERWRITE_PROTOCOL:-https}" 2>/dev/null || true
+        sudo -u www-data php /var/www/html/occ config:system:set overwritewebroot --value="${OVERWRITE_WEBROOT:-}" 2>/dev/null || true
+        sudo -u www-data php /var/www/html/occ config:system:set overwritecondaddr --value="${OVERWRITE_COND_ADDR:-}" 2>/dev/null || true
+        
+        # Configuration des performances
+        sudo -u www-data php /var/www/html/occ config:system:set filelocking.enabled --value=true --type=boolean 2>/dev/null || true
+        sudo -u www-data php /var/www/html/occ config:system:set redis --value="${REDIS_HOST:-}" --type=string 2>/dev/null || true
+        
+        # Forcer la vérification des données
+        sudo -u www-data php /var/www/html/occ maintenance:data-fingerprint 2>/dev/null || true
+        
+        # Réparation si nécessaire
+        sudo -u www-data php /var/www/html/occ maintenance:repair 2>/dev/null || true
+    fi
+fi
+
+# Vérification de la santé des applications
+if [ -f "/var/www/html/occ" ]; then
+    echo "🔍 Vérification de l'état des applications..."
+    sudo -u www-data php /var/www/html/occ app:list | grep -E "(activity|notifications)" || true
+    echo "🔍 Vérification de l'état du système..."
+    sudo -u www-data php /var/www/html/occ status || true
+    echo "🔍 Vérification de l'intégrité du système..."
+    sudo -u www-data php /var/www/html/occ check || true
+fi
+
+# Démarrage d'Apache
+echo "✅ Configuration terminée, démarrage d'Apache..."
+exec "$@"

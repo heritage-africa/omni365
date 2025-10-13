@@ -28,19 +28,43 @@ fi
 # Vérification et activation des applications si nécessaire
 if [ -f "/var/www/html/occ" ]; then
     echo "🔧 Vérification des applications Nextcloud..."
-    # Vérifier si l'app notifications est installée
-    if [ -d "/var/www/html/apps/notifications" ]; then
-        echo "✅ Application Notifications installée"
-        # Activer l'app notifications si ce n'est pas déjà fait
-        sudo -u www-data php /var/www/html/occ app:enable notifications || true
+    
+    # Liste des applications à activer
+    APPS="activity notifications"
+    
+    for app in $APPS; do
+        if [ -d "/var/www/html/apps/$app" ]; then
+            echo "✅ Application $app installée - activation..."
+            sudo -u www-data php /var/www/html/occ app:enable $app || echo "⚠️  Impossible d'activer $app (peut-être déjà activé)"
+        else
+            echo "⚠️  Application $app non trouvée dans /var/www/html/apps/"
+        fi
+    done
+    
+    # Vérification supplémentaire pour Activity
+    if [ -d "/var/www/html/apps/activity" ]; then
+        echo "✅ Application Activity correctement installée"
     else
-        echo "⚠️  Application Notifications non trouvée"
+        echo "❌ Application Activity manquante - la fonctionnalité d'activité ne sera pas disponible"
+    fi
+    
+    # Vérification supplémentaire pour Notifications
+    if [ -d "/var/www/html/apps/notifications" ]; then
+        echo "✅ Application Notifications correctement installée"
+    else
+        echo "❌ Application Notifications manquante"
     fi
 fi
 
 # Vérification des configurations critiques
 if [ ! -f /var/www/html/config/config.php ] && [ -f /var/www/html/config/.ocdata ]; then
     echo "⚠️  Omni365 n'est pas configuré. Veuillez compléter l'installation via l'interface web."
+fi
+
+# Vérification de la santé des applications
+if [ -f "/var/www/html/occ" ]; then
+    echo "🔍 Vérification de l'état des applications..."
+    sudo -u www-data php /var/www/html/occ app:list | grep -E "(activity|notifications)" || true
 fi
 
 # Démarrage d'Apache

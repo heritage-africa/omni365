@@ -19,9 +19,14 @@ ENV NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION} \
     APACHE_RUN_USER=www-data \
     APACHE_RUN_GROUP=www-data \
     HOME=/var/www/html \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    # Variables PostgreSQL importantes
+    POSTGRES_HOST=localhost \
+    POSTGRES_USER=omni365 \
+    POSTGRES_PASSWORD=omni365 \
+    POSTGRES_DB=omni365db
 
-# Installation des dépendances système
+# Installation des dépendances système - AJOUT des paquets PostgreSQL
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     apache2 \
@@ -32,7 +37,7 @@ RUN apt-get update && \
     php8.3-curl \
     php8.3-xml \
     php8.3-mbstring \
-    php8.3-sqlite \
+    php8.3-sqlite3 \
     php8.3-pgsql \
     php8.3-intl \
     php8.3-imagick \
@@ -53,6 +58,7 @@ RUN apt-get update && \
     ca-certificates \
     libmagickcore-6.q16-7-extra \
     sudo \
+    postgresql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -80,7 +86,7 @@ RUN apt-get update && \
 # Activation des extensions APCu et Redis (déjà installées via les paquets)
 RUN phpenmod apcu redis
 
-# Configuration PHP pour Omni365
+# Configuration PHP pour Omni365 - AJOUT de la configuration PostgreSQL
 RUN echo "memory_limit = ${PHP_MEMORY_LIMIT}" > /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "upload_max_filesize = ${PHP_UPLOAD_LIMIT}" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "post_max_size = ${PHP_UPLOAD_LIMIT}" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
@@ -92,13 +98,21 @@ RUN echo "memory_limit = ${PHP_MEMORY_LIMIT}" > /etc/php/8.3/apache2/conf.d/99-n
     echo "opcache.max_accelerated_files = 20000" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "opcache.memory_consumption = ${OPCACHE_MEMORY_CONSUMPTION}" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
     echo "opcache.revalidate_freq = 1" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
-    echo "apc.enable_cli=1" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini
+    echo "apc.enable_cli=1" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
+    # Configuration pour PostgreSQL
+    echo "pdo_pgsql.default_socket=" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
+    echo "pgsql.ignore_notice=0" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini && \
+    echo "pgsql.log_notice=0" >> /etc/php/8.3/apache2/conf.d/99-nextcloud.ini
 
 # Même configuration pour PHP CLI
 RUN echo "memory_limit = ${PHP_MEMORY_LIMIT}" > /etc/php/8.3/cli/conf.d/99-nextcloud.ini && \
     echo "date.timezone = UTC" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini && \
     echo "opcache.enable_cli = 1" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini && \
-    echo "apc.enable_cli=1" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini
+    echo "apc.enable_cli=1" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini && \
+    # Configuration PostgreSQL pour CLI
+    echo "pdo_pgsql.default_socket=" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini && \
+    echo "pgsql.ignore_notice=0" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini && \
+    echo "pgsql.log_notice=0" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini
 
 # Clonage de Omni365 avec retry et shallow clone
 RUN echo "📥 Clonage du repository Omni365..." && \
@@ -146,6 +160,7 @@ RUN echo "📱 Installation de l'application Notifications..." && \
         composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist; \
     fi && \
     echo "✅ Notifications v31.0.7 installée avec succès"
+
 
 # Nettoyage
 RUN rm -rf /tmp/* /var/tmp/* ${HOME}/.cache ${HOME}/.git
@@ -197,13 +212,12 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 8080
 
 # Volume pour les données persistantes
-VOLUME ["/var/www/html/data", "/var/www/html/config", "/var/www/html/apps2"]
+#VOLUME ["/var/www/html/data", "/var/www/html/config", "/var/www/html/apps2"]
 
 # Utilisateur root pour éviter les problèmes de permissions
 # USER www-data  <-- NE PAS utiliser www-data
 
 WORKDIR ${HOME}
 
-
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2ctl", "-D", "FOREGROUND"] 
+CMD ["apache2ctl", "-D", "FOREGROUND"]
