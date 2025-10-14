@@ -4,68 +4,52 @@ set -e
 echo "🚀 Démarrage de Omni365..."
 
 # Configuration des permissions au démarrage
-mkdir -p /var/www/html/data /var/www/html/config /var/www/html/apps2
-mkdir -p /var/log/apache2 /var/run/apache2 /var/www/sessions
+mkdir -p /var/www/html/data /var/www/html/config /var/www/html/apps2 /var/www/sessions
+mkdir -p /var/log/apache2 /var/run/apache2
 
 # Configuration des permissions
-chown -R www-data:www-data /var/www/html/data /var/www/html/config /var/www/html/apps2
-chown -R www-data:www-data /var/log/apache2
-chown -R www-data:www-data /var/www/sessions
-chmod -R 750 /var/www/html/data /var/www/html/config
+chown -R www-data:www-data /var/www/html /var/www/sessions
+chown -R www-data:www-data /var/log/apache2 /var/run/apache2
+chmod -R 750 /var/www/html/config /var/www/html/data
 chmod -R 755 /var/www/html/apps2
-chmod -R 755 /var/log/apache2
 chmod -R 770 /var/www/sessions
 
-# Configuration de PHP pour utiliser notre dossier sessions personnalisé
-if [ -f "/etc/php/8.3/cli/php.ini" ]; then
-    sed -i 's|^;session.save_path = "/tmp"|session.save_path = "/var/www/sessions"|' /etc/php/8.3/cli/php.ini
-fi
-
-if [ -f "/etc/php/8.3/apache2/php.ini" ]; then
-    sed -i 's|^;session.save_path = "/tmp"|session.save_path = "/var/www/sessions"|' /etc/php/8.3/apache2/php.ini
-fi
-
-# Vérification et activation des applications si nécessaire
+# Vérification de la présence des applications
 if [ -f "/var/www/html/occ" ]; then
     echo "🔧 Vérification des applications Nextcloud..."
     
-    # Liste des applications à activer
-    APPS="activity notifications"
-    
-    for app in $APPS; do
-        if [ -d "/var/www/html/apps/$app" ]; then
-            echo "✅ Application $app installée - activation..."
-            sudo -u www-data php /var/www/html/occ app:enable $app || echo "⚠️  Impossible d'activer $app (peut-être déjà activé)"
-        else
-            echo "⚠️  Application $app non trouvée dans /var/www/html/apps/"
-        fi
-    done
-    
-    # Vérification supplémentaire pour Activity
-    if [ -d "/var/www/html/apps/activity" ]; then
-        echo "✅ Application Activity correctement installée"
-    else
-        echo "❌ Application Activity manquante - la fonctionnalité d'activité ne sera pas disponible"
+    # Attendre que la base de données soit prête (si nécessaire)
+    if [ -n "${POSTGRES_HOST}" ] && [ -n "${POSTGRES_USER}" ]; then
+        echo "⏳ Attente de la base de données PostgreSQL..."
+        until pg_isready -h "${POSTGRES_HOST}" -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -t 1; do
+            echo "En attente de la base de données..."
+            sleep 5
+        done
     fi
-    
-    # Vérification supplémentaire pour Notifications
-    if [ -d "/var/www/html/apps/notifications" ]; then
-        echo "✅ Application Notifications correctement installée"
+
+    # Activer les applications si Nextcloud est configuré
+    if [ -f "/var/www/html/config/config.php" ]; then
+        APPS="activity notifications mail"
+        
+        for app in $APPS; do
+            if [ -d "/var/www/html/apps/$app" ]; then
+                echo "✅ Application $app installée - activation..."
+                sudo -E -u www-data php /var/www/html/occ app:enable "$app" --no-interaction || echo "⚠️  Impossible d'activer $app (peut-être déjà activé)"
+            else
+                echo "⚠️  Application $app non trouvée dans /var/www/html/apps/"
+            fi
+        done
+        
+        # Exécuter les mises à jour
+        echo "🔄 Vérification des mises à jour..."
+        sudo -E -u www-data php /var/www/html/occ upgrade --no-interaction || true
     else
-        echo "❌ Application Notifications manquante"
+        echo "⚠️  Nextcloud non configuré. Les applications seront activées après la configuration initiale."
     fi
 fi
 
-# Vérification des configurations critiques
-if [ ! -f /var/www/html/config/config.php ] && [ -f /var/www/html/config/.ocdata ]; then
-    echo "⚠️  Omni365 n'est pas configuré. Veuillez compléter l'installation via l'interface web."
-fi
-
-# Vérification de la santé des applications
-if [ -f "/var/www/html/occ" ]; then
-    echo "🔍 Vérification de l'état des applications..."
-    sudo -u www-data php /var/www/html/occ app:list | grep -E "(activity|notifications)" || true
-fi
+# Configuration des logs Apache
+chown -R www-data:www-data /var/log/apache2
 
 # Démarrage d'Apache
 echo "✅ Configuration terminée, démarrage d'Apache..."
