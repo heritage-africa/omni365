@@ -21,7 +21,7 @@ ENV NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION} \
     HOME=/var/www/html \
     DEBIAN_FRONTEND=noninteractive \
     # Variables PostgreSQL importantes
-    POSTGRES_HOST=localhost \
+    POSTGRES_HOST=postgres \
     POSTGRES_USER=omni365 \
     POSTGRES_PASSWORD=omni365 \
     POSTGRES_DB=omni365db
@@ -161,6 +161,17 @@ RUN echo "📱 Installation de l'application Notifications..." && \
     fi && \
     echo "✅ Notifications v31.0.7 installée avec succès"
 
+# Installation de l'application Mail avec la bonne branche
+RUN echo "📱 Installation de l'application Notifications..." && \
+    cd ${HOME}/apps && \
+    # Cloner avec la branche spécifique omni365-mail-v5.3.3
+    git clone --branch omni365-mail-v5.3.3 --depth 1 https://github.com/heritage-africa/omni365-mail.git && \
+    cd omni365-mail && \
+    # Installation des dépendances de l'app omni365 mail
+    if [ -f "composer.json" ]; then \
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist; \
+    fi && \
+    echo "✅ Mail omni365-mail-v5.3.3 installée avec succès"
 
 # Nettoyage
 RUN rm -rf /tmp/* /var/tmp/* ${HOME}/.cache ${HOME}/.git
