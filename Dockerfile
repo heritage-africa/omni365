@@ -94,8 +94,8 @@ RUN echo "memory_limit = ${PHP_MEMORY_LIMIT}" > /etc/php/8.3/cli/conf.d/99-nextc
     echo "opcache.enable_cli = 1" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini && \
     echo "apc.enable_cli=1" >> /etc/php/8.3/cli/conf.d/99-nextcloud.ini
 
-# Création de la structure de répertoires
-RUN mkdir -p /var/www/html && \
+# Création de la structure de répertoires temporaire
+RUN mkdir -p /var/www/html-temp && \
     chown -R www-data:www-data /var/www
 
 # Clonage de Omni365 avec retry et gestion des erreurs
@@ -112,19 +112,16 @@ RUN echo "📥 Clonage du repository Omni365..." && \
     if [ ! -d "html-temp" ]; then \
         echo "❌ Échec du clonage après 5 tentatives"; \
         exit 1; \
-    fi && \
-    mv html-temp/. html/ && \
-    rm -rf html-temp && \
-    chown -R www-data:www-data /var/www/html
+    fi
 
 # Installation des dépendances Composer
 RUN echo "📦 Installation des dépendances Composer..." && \
-    cd /var/www/html && \
+    cd /var/www/html-temp && \
     sudo -u www-data composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Installation des applications
 RUN echo "📱 Installation des applications..." && \
-    cd /var/www/html/apps && \
+    cd /var/www/html-temp/apps && \
     # Application Activity
     sudo -u www-data git clone --branch v31.0.7 --depth 1 https://github.com/nextcloud/activity.git && \
     cd activity && \
@@ -152,13 +149,6 @@ RUN a2enmod rewrite headers env dir mime && \
 COPY omni365-vhost.conf /etc/apache2/sites-available/nextcloud.conf
 RUN a2ensite nextcloud.conf && a2dissite 000-default.conf
 
-# Création des répertoires nécessaires
-RUN mkdir -p /var/www/html/data /var/www/html/config /var/www/html/apps2 /var/www/sessions && \
-    chown -R www-data:www-data /var/www/html /var/www/sessions && \
-    chmod -R 750 /var/www/html/config /var/www/html/data && \
-    chmod -R 755 /var/www/html/apps2 && \
-    chmod -R 770 /var/www/sessions
-
 # Configuration du session path pour PHP
 RUN for version in cli apache2; do \
         if [ -f "/etc/php/8.3/${version}/php.ini" ]; then \
@@ -169,7 +159,7 @@ RUN for version in cli apache2; do \
 # Nettoyage final
 RUN apt-get autoremove -y && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/www/html/.git
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/www/html-temp/.git
 
 # Script d'initialisation
 COPY entrypoint.sh /entrypoint.sh

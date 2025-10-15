@@ -1,0 +1,28 @@
+<?php
+$CONFIG = array (
+  'instanceid' => 'ocwgrmfejp2z',
+  'passwordsalt' => 'mj0Nx/3LxNCbMts94m1N9TBXO8GAUw',
+  'secret' => '0RMewPN2VIFJFR2gAtpsK8BoYk0TtOfsKGKXdjiuMO/aDsl2',
+  'trusted_domains' =>
+  array (
+    0 => '192.168.14.135:8080',
+  ),
+  'datadirectory' => '/home/base/omni365/data',
+  'dbtype' => 'sqlite3',
+  'version' => '31.0.7.1',
+  'overwrite.cli.url' => 'http://192.168.14.135:8080',
+  'updater.release.channel' => 'beta',
+  'installed' => true,
+
+  
+
+  #'appstore.experimental.enabled' => true,
+  #'appstoreenabled' => true,
+  #'appstoreurl' => 'https://apps.nextcloud.com', 
+  #'appstoreurl' => 'https://apps.nextcloud.com/api/v1',
+  #'appstoreurl' => 'https://raw.githubusercontent.com/heritage-africa/omni365-hub/main/discover.json'
+  #'appstore.discover' => 'https://raw.githubusercontent.com/heritage-africa/omni365-hub/main/discover.json',
+
+
+);
+
