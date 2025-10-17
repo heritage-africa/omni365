@@ -20,9 +20,9 @@
 				'{linkclose}',
 			],
 			[
-				'<a href="https://docs.heritage.africa" target="_blank" rel="noreferrer noopener">',
-				'<a href="https://docs.heritage.africa" target="_blank" rel="noreferrer noopener">',
-				'<a href="https://docs.heritage.africa" target="_blank" rel="noreferrer noopener">',
+				'<a href="https://www.accel-tech.net" target="_blank" rel="noreferrer noopener">',
+				'<a href="https://www.accel-tech.net" target="_blank" rel="noreferrer noopener">',
+				'<a href="https://www.accel-tech.net" target="_blank" rel="noreferrer noopener">',
 				'</a>',
 			],
 			$l->t('Developed by {communityopen}Accel Tech{linkclose}.')

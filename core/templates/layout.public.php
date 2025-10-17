@@ -99,7 +99,7 @@ p($theme->getTitle());
 if ($_['showSimpleSignUpLink']) {
 	?>
 			<p class="footer__simple-sign-up">
-				<a href="<?php p($_['signUpLink']); ?>" target="_blank" rel="noreferrer noopener">
+				<a href="https://www.accel-tech.net" target="_blank" rel="noreferrer noopener">
 					<?php p($l->t('Get your own free account')); ?>
 				</a>
 			</p>
