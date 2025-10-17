@@ -886,7 +886,7 @@ OC.L10N.register(
     "Please double check the <a target=\"_blank\" rel=\"noreferrer noopener\" href=\"%1$s\">installation guides ↗</a>, and check for any errors or warnings in the <a href=\"%2$s\">log</a>." : "Please double check the <a target=\"_blank\" rel=\"noreferrer noopener\" href=\"%1$s\">installation guides ↗</a>, and check for any errors or warnings in the <a href=\"%2$s\">log</a>.",
     "Check the security of your Omni365 over <a target=\"_blank\" rel=\"noreferrer noopener\" href=\"%s\">our security scan ↗</a>." : "Check the security of your Omni365 over <a target=\"_blank\" rel=\"noreferrer noopener\" href=\"%s\">our security scan ↗</a>.",
     "Reasons to use Omni365 in your organization" : "Reasons to use Omni365 in your organization",
-    "Developed by the {communityopen}Omni365 community{linkclose}, the {githubopen}source code{linkclose} is licensed under the {licenseopen}AGPL{linkclose}." : "Developed by the {communityopen}Omni365 community{linkclose}, the {githubopen}source code{linkclose} is licensed under the {licenseopen}AGPL{linkclose}.",
+    "Developed by {communityopen}Accel Tech{linkclose}." : "Developed by {communityopen}Accel Tech{linkclose}.",
     "Like our Facebook page" : "Like our Facebook page",
     "Follow us on X" : "Follow us on X",
     "Follow us on Mastodon" : "Follow us on Mastodon",
