@@ -17,17 +17,7 @@
 /translationtool.phar
 
 # ignore all apps except core ones
-#/apps*/*
 /apps*/*
-
-# ignore notification
-/apps/notifications
-/apps/richdocumentscode/collabora/Collabora_Online.AppImage
-
-# Eccept
-!/apps/mail
-!/apps/mail/lib/Service/PhishingDetection/LinkCheck.php
-
 
 !/apps/cloud_federation_api
 !/apps/comments

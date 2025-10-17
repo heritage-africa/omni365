@@ -76,7 +76,7 @@ class PreviewManager implements IPreview {
 		$this->container = $container;
 		$this->binaryFinder = $binaryFinder;
 		$this->imagickSupport = $imagickSupport;
-		$this->enablePreviews = $config->getSystemValueBool('enable_previews', true);
+		$this->enablePreviews = $config->getSystemValueBool('enable_previews', false);
 	}
 
 	/**
