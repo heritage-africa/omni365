@@ -17,7 +17,7 @@
 /translationtool.phar
 
 # ignore all apps except core ones
-/apps*/*
+#/apps*/*
 
 !/apps/cloud_federation_api
 !/apps/comments

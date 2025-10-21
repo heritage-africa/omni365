@@ -1,0 +1,37 @@
+# Exclude npm stuff
+/build
+/node_modules
+
+# PHP Code Sniffer
+/vendor
+/vendor-bin/*/vendor
+/lib/Vendor
+/.php-cs-fixer.cache
+
+# Local docs
+/site
+
+# Karma/jasmine coverage data
+/coverage
+/tests/php/coverage-html
+/tests/php/clover.xml
+/tests/php/.phpunit.result.cache
+/tests/integration/vendor
+/tests/integration/output
+/drone
+
+# PHP Dev server output (integration tests)
+/tests/integration/phpserver*.log
+
+# Compiled javascript
+/js
+
+# VScode settings
+/.vscode
+*.code-workspace
+
+# JetBrains IDEs settings
+/.idea
+
+# JetBrains Fleet settings
+/.fleet
