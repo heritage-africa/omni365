@@ -19,6 +19,9 @@
 # ignore all apps except core ones
 #/apps*/*
 
+!/apps/mail/vendor
+!/apps/spreed/vendor
+!/apps/vendor
 !/apps/cloud_federation_api
 !/apps/comments
 !/apps/contactsinteraction

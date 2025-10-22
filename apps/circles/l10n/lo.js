@@ -1,0 +1,16 @@
+OC.L10N.register(
+    "circles",
+    {
+    "Personal" : "ສ່ວນບຸກຄົນ",
+    "Federated" : "ການຕິດຕໍ່",
+    "Admin" : "ຜູ້ເບິ່ງເເຍງລະບົບ",
+    "Owner" : "ເຈົ້າຂອງ",
+    "Files" : "ຟາຍ",
+    "Open %s" : "ເປີດ {ຊື່ຟາຍ}",
+    "Loading…" : "ກຳລັງໂຫຼດ",
+    "No files in here" : "ບໍ່ມີຟາຍໃນທີ່ນີ້",
+    "Name" : "ຊື່",
+    "Size" : "ຂະຫນາດ",
+    "Modified" : "\"{name}\" ແມ່ນຊື່ໄຟລ໌ທີ່ບໍ່ຖືກຕ້ອງ."
+},
+"nplurals=1; plural=0;");
