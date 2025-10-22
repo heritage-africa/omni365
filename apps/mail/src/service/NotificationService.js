@@ -77,7 +77,7 @@ const getNotificationBody = (messages) => {
 
 export const showNewMessagesNotification = (messages) => {
 	showNotification(
-		t('mail', 'Nextcloud Mail'),
+		t('mail', 'Omni365 Mail'),
 		getNotificationBody(messages),
 		generateFilePath('mail', 'img', 'mail-notification.png'),
 	)
