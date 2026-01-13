@@ -177,7 +177,7 @@ body {
 
 .login-box {
 	// Same size as dashboard panels
-	width: 320px;
+	width: 640px;
 	box-sizing: border-box;
 
 	&__link {
